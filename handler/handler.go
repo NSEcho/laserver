@@ -13,7 +13,7 @@ type Handler struct {
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Print("Got request from", r.RemoteAddr)
+	log.Printf("Got request from %s", r.RemoteAddr)
 	uuid := r.URL.Query().Get("id")
 	if uuid != "" {
 		d := db.Data{
