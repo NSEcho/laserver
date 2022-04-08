@@ -22,14 +22,14 @@ var serveCmd = &cobra.Command{
 			return err
 		}
 
-		log.Printf("Starting the server on %s", addr)
-		log.Printf("Using database %s", dbPath)
-
 		db := db.NewDB(dbPath)
 		defer db.Close()
 
 		h := handler.NewHandler(db, "laserver.log")
 		defer h.Close()
+
+		log.Printf("Starting the server on %s", addr)
+		log.Printf("Using database %s", dbPath)
 
 		http.Handle("/", h)
 		return http.ListenAndServe(addr, nil)
