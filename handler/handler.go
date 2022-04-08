@@ -13,17 +13,31 @@ type Handler struct {
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Got request from %s", r.RemoteAddr)
+
 	uuid := r.URL.Query().Get("id")
 	if uuid != "" {
+		log.Printf("Got request from %s with id %s", r.RemoteAddr, uuid)
 		d := db.Data{
 			UUID: uuid,
 			Time: time.Now(),
 		}
-		if err := h.DB.Save(&d); err != nil {
-			log.Printf("Error saving to db: %v", err)
+		found, err := h.DB.Exists(uuid)
+		if err != nil {
+			log.Printf("Error checking for uuid presence: %v", err)
+			w.WriteHeader(http.StatusOK)
 			return
 		}
-		log.Printf("%s saved successfully", uuid)
+		if !found {
+			if err := h.DB.Save(&d); err != nil {
+				log.Printf("Error saving to db: %v", err)
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			log.Printf("%s saved successfully", uuid)
+		}
+		w.WriteHeader(http.StatusOK)
+		return
 	}
+	log.Printf("Got request from %s without id", r.RemoteAddr)
+	w.WriteHeader(http.StatusOK)
 }
