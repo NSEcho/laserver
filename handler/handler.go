@@ -20,8 +20,9 @@ type Handler struct {
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	uuid := r.URL.Query().Get("id")
+	ua := getUserAgent(r)
 	if uuid != "" {
-		log.Printf("Got request from %s with id %s", r.RemoteAddr, uuid)
+		log.Printf("Got request from %s with id %s from %s", r.RemoteAddr, uuid, ua)
 		d := db.Data{
 			UUID: uuid,
 			Time: time.Now(),
@@ -43,6 +44,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		return
 	}
-	log.Printf("Got request from %s without id", r.RemoteAddr)
+	log.Printf("Got request from %s without id from %s", r.RemoteAddr, ua)
 	w.WriteHeader(http.StatusOK)
+}
+
+func getUserAgent(r *http.Request) string {
+	return r.Header.Get("User-Agent")
 }
