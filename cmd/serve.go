@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/lateralusd/laserver/db"
 	"github.com/lateralusd/laserver/handler"
@@ -25,8 +27,16 @@ var serveCmd = &cobra.Command{
 		db := db.NewDB(dbPath)
 		defer db.Close()
 
-		h := handler.NewHandler(db, "laserver.log")
-		defer h.Close()
+		f, err := os.OpenFile("laserver.log", os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		wr := io.MultiWriter(os.Stdout, f)
+		log.SetOutput(wr)
+
+		h := handler.NewHandler(db)
 
 		log.Printf("Starting the server on %s", addr)
 		log.Printf("Using database %s", dbPath)

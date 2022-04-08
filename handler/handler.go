@@ -1,35 +1,21 @@
 package handler
 
 import (
-	"io"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/lateralusd/laserver/db"
 )
 
-func NewHandler(db *db.DB, logPath string) *Handler {
-	f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE, 0666)
-	if err != nil {
-		panic(err)
-	}
-	wr := io.MultiWriter(os.Stdout, f)
-	log.SetOutput(wr)
+func NewHandler(db *db.DB) *Handler {
 	return &Handler{
 		db: db,
-		f:  f,
 	}
 }
 
 type Handler struct {
 	db *db.DB
-	f  *os.File
-}
-
-func (h *Handler) Close() {
-	h.f.Close()
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
