@@ -11,7 +11,7 @@ import (
 )
 
 func NewHandler(db *db.DB, logPath string) *Handler {
-	f, err := os.OpenFile(logPath, os.O_RDWR|os.O_APPEND|os.O_CREATE, os.ModePerm)
+	f, err := os.OpenFile(logPath, os.O_APPEND|os.O_CREATE, 0666)
 	if err != nil {
 		panic(err)
 	}
