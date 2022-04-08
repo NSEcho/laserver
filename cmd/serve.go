@@ -28,9 +28,9 @@ var serveCmd = &cobra.Command{
 		db := db.NewDB(dbPath)
 		defer db.Close()
 
-		h := &handler.Handler{
-			DB: db,
-		}
+		h := handler.NewHandler(db, "laserver.log")
+		defer h.Close()
+
 		http.Handle("/", h)
 		return http.ListenAndServe(addr, nil)
 	},
