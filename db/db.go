@@ -68,6 +68,27 @@ func (d *DB) Save(data *Data) error {
 	})
 }
 
+func (d *DB) Exists(uuid string) (bool, error) {
+	found := false
+	err := d.db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(DataBucket)
+		c := b.Cursor()
+
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			var dt Data
+			if err := json.Unmarshal(v, &dt); err != nil {
+				return err
+			}
+			if dt.UUID == uuid {
+				found = true
+				return nil
+			}
+		}
+		return nil
+	})
+	return found, err
+}
+
 func itob(v int) []byte {
 	b := make([]byte, 8)
 	binary.BigEndian.PutUint64(b, uint64(v))

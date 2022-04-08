@@ -1,20 +1,9 @@
 package main
 
-import (
-	"log"
-	"net/http"
-
-	"github.com/lateralusd/laserver/db"
-	"github.com/lateralusd/laserver/handler"
-)
+import "github.com/lateralusd/laserver/cmd"
 
 func main() {
-	db := db.NewDB("data.db")
-	defer db.Close()
-
-	h := &handler.Handler{
-		DB: db,
+	if err := cmd.RootCmd.Execute(); err != nil {
+		panic(err)
 	}
-	http.Handle("/", h)
-	log.Fatal(http.ListenAndServe(":3300", nil))
 }
